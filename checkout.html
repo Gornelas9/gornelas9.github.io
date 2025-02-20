@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout - Webify</title>
+    <link rel="stylesheet" href="stylecheckout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <!-- Add PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=EUR"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Webify</a>
+            <div class="nav-links">
+                <a href="index.html#services">Services</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="index.html#why-us">Why Us</a>
+                <a href="index.html#testimonials">Testimonials</a>
+                <a href="index.html#request-form" class="cta-button-sm">Get Started</a>
+            </div>
+            <div class="menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Secure Checkout</h2>
+                <p>Complete your purchase securely</p>
+            </div>
+
+            <div class="checkout-container">
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <div class="package-selector">
+                        <label for="change-package">Select Package:</label>
+                        <select id="change-package">
+                            <option value="Basic Website" data-price="200">Basic Website (€200)</option>
+                            <option value="Advanced Website" data-price="400">Advanced Website (€400)</option>
+                            <option value="Online Store" data-price="600">Online Store (€600)</option>
+                            <option value="Monthly Maintenance" data-price="50">Monthly Maintenance (€50/month)</option>
+                        </select>
+                    </div>
+
+                    <div class="summary-details">
+                        <div class="summary-item" id="summary-package">
+                            <span class="item-name">Package:</span>
+                            <span class="item-value" id="package-name">Basic Website</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="item-name">Price:</span>
+                            <span class="item-value" id="package-price">€200</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-total">
+                            <span class="total-label">Total:</span>
+                            <span class="total-amount" id="total-amount">€200</span>
+                        </div>
+                    </div>
+
+                    <div class="secure-badges">
+                        <div class="secure-badge">
+                            <i class="fas fa-lock"></i>
+                            <span>Secure Payment</span>
+                        </div>
+                        <div class="secure-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>SSL Encrypted</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="payment-methods">
+                    <h3>Select Payment Method</h3>
+                    <div class="payment-options">
+                        <div class="payment-option active" data-method="card">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Credit/Debit Card</span>
+                        </div>
+                        <div class="payment-option" data-method="paypal">
+                            <i class="fab fa-paypal"></i>
+                            <span>PayPal</span>
+                        </div>
+                        <div class="payment-option" data-method="bank">
+                            <i class="fas fa-university"></i>
+                            <span>Bank Transfer</span>
+                        </div>
+                    </div>
+
+                    <div class="payment-forms">
+                        <!-- Stripe Card Element -->
+                        <div class="payment-form active" id="card-payment">
+                            <form id="stripe-payment-form">
+                                <div class="form-group">
+                                    <label for="cardholder-name">Cardholder Name</label>
+                                    <input type="text" id="cardholder-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="card-element">Card Details</label>
+                                    <div id="card-element" class="stripe-element"></div>
+                                    <div id="card-errors" class="error-message"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="billing-email">Email</label>
+                                    <input type="email" id="billing-email" required>
+                                </div>
+                                <button type="submit" class="payment-button">
+                                    <i class="fas fa-lock"></i> Pay €<span class="button-amount">200</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- PayPal -->
+                        <div class="payment-form" id="paypal-payment">
+                            <div class="paypal-container">
+                                <div class="paypal-info">
+                                    <i class="fab fa-paypal"></i>
+                                    <p>Click the PayPal button below to complete your payment securely with PayPal.</p>
+                                </div>
+                                <div id="paypal-button-container"></div>
+                            </div>
+                        </div>
+
+                        <!-- Bank Transfer -->
+                        <div class="payment-form" id="bank-payment">
+                            <div class="bank-details">
+                                <div class="bank-info">
+                                    <h4>Bank Transfer Details</h4>
+                                    <p>Please transfer the total amount to the following bank account:</p>
+                                </div>
+                                <div class="bank-data">
+                                    <div class="bank-row">
+                                        <span class="bank-label">Bank Name:</span>
+                                        <span class="bank-value">European Central Bank</span>
+                                    </div>
+                                    <div class="bank-row">
+                                        <span class="bank-label">Account Name:</span>
+                                        <span class="bank-value">Webify Ltd</span>
+                                    </div>
+                                    <div class="bank-row">
+                                        <span class="bank-label">IBAN:</span>
+                                        <span class="bank-value">EU00 1234 5678 9012 3456 78</span>
+                                        <button class="copy-button" data-copy="EU00 1234 5678 9012 3456 78">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div class="bank-row">
+                                        <span class="bank-label">SWIFT/BIC:</span>
+                                        <span class="bank-value">WEBIFYBANK</span>
+                                        <button class="copy-button" data-copy="WEBIFYBANK">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div class="bank-row">
+                                        <span class="bank-label">Amount:</span>
+                                        <span class="bank-value">€<span class="bank-amount">200</span></span>
+                                    </div>
+                                    <div class="bank-row">
+                                        <span class="bank-label">Reference:</span>
+                                        <span class="bank-value">WEB-<span id="reference-number"></span></span>
+                                        <button class="copy-button" data-copy="">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bank-instructions">
+                                    <p>After making the transfer, please:</p>
+                                    <ol>
+                                        <li>Save or screenshot your transfer confirmation</li>
+                                        <li>Email the confirmation to <a href="mailto:payments@webify.com">payments@webify.com</a></li>
+                                        <li>Include your reference number in the email</li>
+                                    </ol>
+                                </div>
+                                <button class="payment-button" id="confirm-bank-transfer">
+                                    <i class="fas fa-check"></i> Confirm Bank Transfer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-footer">
+                <div class="payment-security">
+                    <div class="security-badges">
+                        <img src="/api/placeholder/60/40" alt="Secure SSL" class="security-badge">
+                        <img src="/api/placeholder/60/40" alt="Stripe Secure" class="security-badge">
+                        <img src="/api/placeholder/60/40" alt="PayPal Verified" class="security-badge">
+                    </div>
+                    <p>Your payment is secure and encrypted. We never store your card details.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="payment-success" class="payment-success">
+        <div class="success-content">
+            <i class="fas fa-check-circle"></i>
+            <h3>Payment Successful!</h3>
+            <p>Thank you for your purchase. We will start working on your website right away.</p>
+            <div class="success-details">
+                <p>Reference Number: <span id="success-reference"></span></p>
+                <p>Amount Paid: €<span id="success-amount"></span></p>
+            </div>
+            <p>You will receive a confirmation email shortly.</p>
+            <div class="success-actions">
+                <a href="index.html" class="back-home-button">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <a href="index.html" class="logo">Webify</a>
+                    <p>Fast and affordable website creation for small businesses.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html#services">Services</a></li>
+                        <li><a href="index.html#pricing">Pricing</a></li>
+                        <li><a href="index.html#why-us">Why Choose Us</a></li>
+                        <li><a href="index.html#testimonials">Testimonials</a></li>
+                        <li><a href="index.html#request-form">Request a Website</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> info@webify.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Web Street, Digital City</li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h4>Follow Us</h4>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Webify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
